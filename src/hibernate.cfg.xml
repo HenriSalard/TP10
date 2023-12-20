@@ -18,6 +18,10 @@ name="connection.url">jdbc:mysql://localhost:3306/tp10</property>
  <mapping class="TP10.User"></mapping>
  <mapping class="TP10.TypeAnalyse"></mapping>
  <mapping class="TP10.Medecin"></mapping>
-
+ <mapping class="TP10.Autorisation"></mapping>
+ <mapping class="TP10.AutorisationId"></mapping>
+ <mapping class="TP10.Planning"></mapping>
+ <mapping class="TP10.PlanningId"></mapping>
+ <mapping class="TP10.Visite"></mapping>
  </session-factory>
 </hibernate-configuration>

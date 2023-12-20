@@ -23,6 +23,8 @@ public class Main {
 
             SessionFactory sessFact = HibernateUtil.getSessionFactory();
 
+            CreateData.FillTable(sessFact);
+
             sessFact.close();
 
 

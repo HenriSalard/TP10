@@ -21,6 +21,11 @@ public class HibernateUtil {
             conf.addAnnotatedClass(model.Medecin.class);
             conf.addAnnotatedClass(model.TypeAnalyse.class);
             conf.addAnnotatedClass(model.User.class);
+            conf.addAnnotatedClass(model.Autorisation.class);
+            conf.addAnnotatedClass(model.AutorisationId.class);
+            conf.addAnnotatedClass(model.Planning.class);
+            conf.addAnnotatedClass(model.PlanningId.class);
+            conf.addAnnotatedClass(model.Visite.class);
             conf.configure();
             ServiceRegistry sr = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
             sessionFactory = conf.buildSessionFactory(sr);
