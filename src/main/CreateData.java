@@ -1,13 +1,19 @@
 package main;
 
 import java.sql.SQLException;
+import java.sql.Time;
+import java.time.DayOfWeek;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import model.*;
 
+import static main.Requete.FindMedAut;
+import static main.Requete.FindRDVMed;
+
 public class CreateData {
+    @SuppressWarnings("deprecation")
     public static void FillTable(SessionFactory sessFact) throws SQLException {
 
         Session session = sessFact.getCurrentSession();
@@ -52,7 +58,81 @@ public class CreateData {
         med2.setSalaire(46000);
         session.save(med2);
 
+        //Type Analyse
+        TypeAnalyse type1 = new TypeAnalyse();
+        type1.setLabelType("Sang");
+        type1.setDuree(20);
+        session.save(type1);
+
+        TypeAnalyse type2 = new TypeAnalyse();
+        type2.setLabelType("VIH");
+        type2.setDuree(30);
+        session.save(type2);
+
+        TypeAnalyse type3 = new TypeAnalyse();
+        type3.setLabelType("Diabète");
+        type3.setDuree(40);
+        session.save(type3);
+
+        //Autorisation
+        Autorisation auto1 = new Autorisation();
+        auto1.setIdAuto(new AutorisationId(med1,type2));
+        session.save(auto1);
+
+        Autorisation auto2 = new Autorisation();
+        auto2.setIdAuto(new AutorisationId(med2,type2));
+        session.save(auto2);
+
+        Autorisation auto3 = new Autorisation();
+        auto3.setIdAuto(new AutorisationId(med1,type3));
+        session.save(auto3);
+
+        Autorisation auto4 = new Autorisation();
+        auto4.setIdAuto(new AutorisationId(med2,type1));
+        session.save(auto4);
+
+        //Planning
+        Planning plan1 = new Planning();
+        plan1.setIdPlan(new PlanningId(med1, DayOfWeek.MONDAY));
+        plan1.setStartHour(new Time(8,0,0));
+        plan1.setEndHour(new Time(16,0,0));
+        session.save(plan1);
+
+        Planning plan2 = new Planning();
+        plan2.setIdPlan(new PlanningId(med1, DayOfWeek.WEDNESDAY));
+        plan2.setStartHour(new Time(10,0,0));
+        plan2.setEndHour(new Time(18,0,0));
+        session.save(plan2);
+
+        Planning plan3 = new Planning();
+        plan3.setIdPlan(new PlanningId(med1, DayOfWeek.THURSDAY));
+        plan3.setStartHour(new Time(8,0,0));
+        plan3.setEndHour(new Time(12,0,0));
+        session.save(plan3);
+
+        Planning plan4 = new Planning();
+        plan4.setIdPlan(new PlanningId(med2, DayOfWeek.MONDAY));
+        plan4.setStartHour(new Time(9,0,0));
+        plan4.setEndHour(new Time(17,0,0));
+        session.save(plan4);
+
+        Planning plan5 = new Planning();
+        plan5.setIdPlan(new PlanningId(med2, DayOfWeek.FRIDAY));
+        plan5.setStartHour(new Time(13,0,0));
+        plan5.setEndHour(new Time(18,0,0));
+        session.save(plan5);
+
+
+
         tr.commit();
         session.close();
+
+        /*for(Object i : FindMedAut(sessFact,type2))
+        {
+            System.out.println((long)i);
+            for(DayOfWeek d : FindRDVMed(sessFact,(long)i)){
+                System.out.println(d.toString());
+            }
+        }*/
     }
 }

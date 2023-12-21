@@ -19,6 +19,15 @@ public class AutorisationId implements Serializable {
     @JoinColumn(name = "idAnalyse")
     private TypeAnalyse autoType;
 
+    public AutorisationId(Medecin med, TypeAnalyse type) {
+        autoMed=med;
+        autoType=type;
+    }
+
+    public AutorisationId() {
+
+    }
+
     public Medecin getAutoMed() {
         return autoMed;
     }
