@@ -2,11 +2,13 @@ package main;
 
 import model.Medecin;
 import model.TypeAnalyse;
+import model.Visite;
 import net.bytebuddy.asm.Advice;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
+import java.sql.Time;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,7 +37,7 @@ public class Requete {
 
     }
 
-    public static List<DayOfWeek> FindRDVMed(SessionFactory sessFact, long idMed){
+    public static List<DayOfWeek> FindDayMed(SessionFactory sessFact, long idMed){
 
         Session session = sessFact.getCurrentSession();
         org.hibernate.Transaction tr = session.beginTransaction();
@@ -50,5 +52,31 @@ public class Requete {
         tr.rollback();
         session.close();
         return lisDay;
+    }
+
+    public static Integer FindTotalTimeVisMedDay(SessionFactory sessFact, long idMed, DayOfWeek day){
+
+        Session session = sessFact.getCurrentSession();
+        org.hibernate.Transaction tr = session.beginTransaction();
+
+        //VERIFIE QUE VISITE N4EST PAS VIDE
+        Query<Long> querycount = session.createQuery("SELECT COUNT(*) FROM Visite", Long.class);
+        if(querycount.getSingleResult()>0){
+            Query<Integer> query = session.createQuery("SELECT SUM(duree) "
+                    + "FROM Visite V INNER JOIN V.fk_Med M "
+                    + "WHERE  M.numSecuriteSociale =: idMed AND DAYNAME(V.dateAnalyse) =: dayParam", Integer.class);
+            query.setParameter("idMed", idMed);
+            query.setParameter("dayParam", day);
+
+            tr.rollback();
+            session.close();
+            return query.getSingleResult();
+        }
+        else{
+            System.out.println("Pas de visite passé ou à venir.");
+            tr.rollback();
+            session.close();
+            return -1;
+        }
     }
 }

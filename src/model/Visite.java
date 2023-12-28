@@ -24,10 +24,10 @@ public class Visite {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="Medecin_numSecuriteSociale")
-    private User fk_Med;
+    private Medecin fk_Med;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="typeAnalyse_labelType")
-    private User fk_Type;
+    private TypeAnalyse fk_Type;
 }
 

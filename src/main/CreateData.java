@@ -9,8 +9,7 @@ import org.hibernate.SessionFactory;
 
 import model.*;
 
-import static main.Requete.FindMedAut;
-import static main.Requete.FindRDVMed;
+import static main.Requete.*;
 
 public class CreateData {
     @SuppressWarnings("deprecation")
@@ -127,12 +126,13 @@ public class CreateData {
         tr.commit();
         session.close();
 
-        /*for(Object i : FindMedAut(sessFact,type2))
+        for(Object i : FindMedAut(sessFact,type2))
         {
             System.out.println((long)i);
-            for(DayOfWeek d : FindRDVMed(sessFact,(long)i)){
+            for(DayOfWeek d : FindDayMed(sessFact,(long)i)){
                 System.out.println(d.toString());
+                System.out.println("Temps total du médecin i au jour d : " +FindTotalTimeVisMedDay(sessFact,(long)i,d));
             }
-        }*/
+        }
     }
 }
