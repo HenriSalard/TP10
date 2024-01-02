@@ -12,9 +12,9 @@ import javax.persistence.Table;
 public class Medecin {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "numSecuriteSociale")
-    private int numSecuriteSociale;
+    private long numSecuriteSociale;
 
     @Column(name = "nom")
     private String nom;
@@ -45,11 +45,11 @@ public class Medecin {
         this.prenom = prenom;
     }
 
-    public int getIdMed() {
+    public long getIdMed() {
         return numSecuriteSociale;
     }
 
-    public void setIdMed(int idMed) {
+    public void setIdMed(long idMed) {
         this.numSecuriteSociale = idMed;
     }
 
@@ -59,5 +59,13 @@ public class Medecin {
 
     public void setMotDePasse(String motDePasse) {
         this.motDePasse = motDePasse;
+    }
+
+    public double getSalaire() {
+        return salaire;
+    }
+
+    public void setSalaire(double salaire) {
+        this.salaire = salaire;
     }
 }

@@ -8,30 +8,42 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "typeAnalyse")
+@Table(name = "TypeAnalyse")
 public class TypeAnalyse {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idType")
+    private int idType;
+
     @Column(name = "labelType")
-    private int labelType;
+    private String labelType;
 
     @Column(name = "duree")
-    private String duree;
+    private int duree;
+    //En minutes
 
-    public int getLabelType() {
+    public String getLabelType() {
         return labelType;
     }
 
-    public void setLabelType(int labelType) {
+    public void setLabelType(String labelType) {
         this.labelType = labelType;
     }
 
-    public String getDuree() {
+    public int getDuree() {
         return duree;
     }
 
-    public void setDuree(String duree) {
+    public void setDuree(int duree) {
         this.duree = duree;
+    }
+
+    public int getIdType() {
+        return idType;
+    }
+
+    public void setIdType(int idType) {
+        this.idType = idType;
     }
 }

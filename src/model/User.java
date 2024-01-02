@@ -12,9 +12,9 @@ import javax.persistence.Table;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "numSecuriteSociale")
-    private int numSecuriteSociale;
+    private long numSecuriteSociale;
 
     @Column(name = "nom")
     private String nom;
@@ -41,11 +41,11 @@ public class User {
         this.prenom = prenom;
     }
 
-    public int getIdUser() {
+    public long getIdUser() {
         return numSecuriteSociale;
     }
 
-    public void setIdUser(int idUser) {
+    public void setIdUser(long idUser) {
         this.numSecuriteSociale = idUser;
     }
 

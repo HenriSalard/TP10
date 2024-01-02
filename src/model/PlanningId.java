@@ -20,6 +20,15 @@ public class PlanningId implements Serializable {
     @Column(name = "Jour")
     private DayOfWeek planJour;
 
+    public PlanningId(Medecin med, DayOfWeek dayOfWeek) {
+        planMed = med;
+        planJour = dayOfWeek;
+    }
+
+    public PlanningId() {
+
+    }
+
     public Medecin getPlanMed() {
         return planMed;
     }
