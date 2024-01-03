@@ -2,19 +2,15 @@ package main;
 
 import model.Medecin;
 import model.TypeAnalyse;
+import model.User;
 import model.Visite;
-import net.bytebuddy.asm.Advice;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
-import java.sql.Time;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 public class Requete {
 
@@ -24,7 +20,7 @@ public class Requete {
         Session session = sessFact.getCurrentSession();
         org.hibernate.Transaction tr = session.beginTransaction();
 
-        Query<Object[]> query = session.createQuery("SELECT M.numSecuriteSociale "
+        Query<Object[]> query = session.createQuery("SELECT new Medecin(M.numSecuriteSociale,M.nom,M.prenom,M.salaire) "
                 + "FROM Autorisation A INNER JOIN A.idAuto.autoMed M INNER JOIN A.idAuto.autoType T "
                 + "WHERE  idType=: typA",Object[].class);
         query.setParameter("typA", type.getIdType());
@@ -79,4 +75,56 @@ public class Requete {
             return -1;
         }
     }
+
+    //Renvoie tous les Types d'analyses
+    public static List<TypeAnalyse> AllType(SessionFactory sessFact){
+
+        Session session = sessFact.getCurrentSession();
+        org.hibernate.Transaction tr = session.beginTransaction();
+
+        Query<TypeAnalyse> query = session.createQuery("FROM TypeAnalyse", TypeAnalyse.class);
+
+        List<TypeAnalyse> lisType = query.getResultList();
+
+        tr.rollback();
+        session.close();
+        return lisType;
+    }
+
+    //Renvoie les visites d'un Utilisateur
+    public static List<Visite> VisFromUser(SessionFactory sessFact, User user){
+
+        Session session = sessFact.getCurrentSession();
+        org.hibernate.Transaction tr = session.beginTransaction();
+
+        Query<Visite> query = session.createQuery("FROM Visite " +
+                "WHERE fk_user =: userParam", Visite.class);
+        query.setParameter("userParam",user);
+
+        List<Visite> lisVis = query.getResultList();
+
+        tr.rollback();
+        session.close();
+        return lisVis;
+    }
+
+    public static boolean AddVisite(SessionFactory sessFact, TypeAnalyse type, Medecin med, User patient, LocalDateTime day_time){
+        Session session = sessFact.getCurrentSession();
+        org.hibernate.Transaction tr = session.beginTransaction();
+
+        //Attention on ne vérifie pas (pour l'instant) la cohérence des informations
+        Visite vis = new Visite();
+        vis.setDateAnalyse(day_time);
+        vis.setFk_Med(med);
+        vis.setFk_Type(type);
+        vis.setFk_User(patient);
+        session.save(vis);
+
+        tr.commit();
+        session.close();
+
+        return true;
+
+    }
+
 }

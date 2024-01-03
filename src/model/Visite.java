@@ -29,5 +29,53 @@ public class Visite {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="typeAnalyse_labelType")
     private TypeAnalyse fk_Type;
+
+    public int getIdVisite() {
+        return idVisite;
+    }
+
+    public void setIdVisite(int idVisite) {
+        this.idVisite = idVisite;
+    }
+
+    public LocalDateTime getDateAnalyse() {
+        return dateAnalyse;
+    }
+
+    public void setDateAnalyse(LocalDateTime dateAnalyse) {
+        this.dateAnalyse = dateAnalyse;
+    }
+
+    public String getResultat() {
+        return resultat;
+    }
+
+    public void setResultat(String resultat) {
+        this.resultat = resultat;
+    }
+
+    public User getFk_User() {
+        return fk_User;
+    }
+
+    public void setFk_User(User fk_User) {
+        this.fk_User = fk_User;
+    }
+
+    public Medecin getFk_Med() {
+        return fk_Med;
+    }
+
+    public void setFk_Med(Medecin fk_Med) {
+        this.fk_Med = fk_Med;
+    }
+
+    public TypeAnalyse getFk_Type() {
+        return fk_Type;
+    }
+
+    public void setFk_Type(TypeAnalyse fk_Type) {
+        this.fk_Type = fk_Type;
+    }
 }
 

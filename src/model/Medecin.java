@@ -2,8 +2,6 @@ package model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -28,6 +26,16 @@ public class Medecin {
     @Column(name = "salaire")
     private double salaire;
 
+    public Medecin(long numsecu,String nom,String prenom,double salaire)
+    {
+        this.nom=nom;
+        this.prenom=prenom;
+        this.numSecuriteSociale=numsecu;
+        this.motDePasse="automatic_fake_password";
+        this.salaire=salaire;
+    }
+
+    public Medecin(){}
 
     public String getNom() {
         return nom;
