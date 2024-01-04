@@ -125,7 +125,7 @@ public class CreateData {
         vis.setFk_User(utilisateur1);
         vis.setFk_Type(type2);
         vis.setFk_Med(med1);
-        vis.setDateAnalyse(LocalDateTime.of(2024, Month.JANUARY,4, 10,0));
+        vis.setDateAnalyse(LocalDateTime.of(2024, Month.JANUARY,8, 10,0));
         session.save(vis);
 
         tr.commit();
@@ -139,6 +139,7 @@ public class CreateData {
 
         System.out.println(Requete.UserFromNumSec(sessFact,100000000001L).getNom());
 
-        System.out.println(Requete.DateRDVForMedDuration(sessFact,med1,30).toString());
+        for (LocalDateTime loc : Requete.DateRDVForMedDuration(sessFact,med1,30)) System.out.println(loc.toString());
+
     }
 }

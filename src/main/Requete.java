@@ -10,9 +10,12 @@ import org.hibernate.query.Query;
 
 import java.sql.Time;
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Requete {
@@ -92,7 +95,7 @@ public class Requete {
         }
         tr.rollback();
         session.close();
-        return -1;
+        return 0;
     }
 
     //Renvoie tous les Types d'analyses
@@ -161,14 +164,17 @@ public class Requete {
         return utilisateur;
     }
 
-    public static LocalDate DateRDVForMedDuration(SessionFactory sessFact, Medecin med, int duree){
+    public static ArrayList<LocalDateTime> DateRDVForMedDuration(SessionFactory sessFact, Medecin med, int duree){
+
+        ArrayList<LocalDateTime> lisDayRdDV = new ArrayList<LocalDateTime>();
 
         //On regarde a partir de demain
-        LocalDate dayRDV = LocalDate.now();
-        int i =0;
+        LocalDateTime dayRDV = LocalDateTime.now();
+        int iSemaine = 0;
         //Tant que l'on a pas trouvé le jour
-        while(i<5){
-            i++;
+        //On cherche les 6 premières dates et dans les 10 premières semaines
+        while( iSemaine < 10 && lisDayRdDV.size() < 6 ){
+            iSemaine++;
             //Seulement les jours où le médecin travaille
             for(DayOfWeek dayWeek : FindDayMed(sessFact,med.getIdMed())){
 
@@ -176,32 +182,44 @@ public class Requete {
                 dayRDV = dayRDV.with(TemporalAdjusters.next(dayWeek));
 
                 //On récupère le temps utilisé par le médecin ce jour là
-                long timeused = Requete.FindTotalTimeVisMedDate(sessFact,med.getIdMed(),dayRDV);
+                long timeused = Requete.FindTotalTimeVisMedDate(sessFact,med.getIdMed(),dayRDV.toLocalDate());
 
                 //On récupèrele temps total de ce médecin ce jour là
                 Session session = sessFact.getCurrentSession();
                 org.hibernate.Transaction tr = session.beginTransaction();
 
-                Query query = session.createQuery("SELECT (hour(endHour)-hour(startHour))*60 + minute(endHour)-minute(startHour) " +
+                Query query = session.createQuery("SELECT endHour,startHour " +
                         "FROM Planning " +
                         "WHERE idPlan.planMed =: medParam AND idPlan.planJour =: dayParam");
                 query.setParameter("medParam",med);
                 query.setParameter("dayParam",dayWeek);
 
-                int minuteDay = (int)query.getSingleResult();
+                Object[] list = (Object[]) query.getSingleResult();
+                int startHour = ((Time)list[1]).getHours();
+                int endHour = ((Time)list[0]).getHours();
+                int startMin = ((Time)list[1]).getMinutes();
+                int endMin = ((Time)list[0]).getMinutes();
 
-                tr.rollback();
-                session.close();
+                int minuteDay = (endHour-startHour)*60 + endMin - startMin;
 
                 System.out.println("Temps total : "+minuteDay + " Temps utilisé : " + timeused );
                 System.out.println("Duree : "+duree + " Temps restant : " + (minuteDay - timeused) );
 
+                tr.rollback();
+                session.close();
+
                 if(minuteDay - timeused > duree) {
-                    return dayRDV;
+                    dayRDV = dayRDV.withHour(startHour);
+                    dayRDV = dayRDV.withMinute(startMin);
+                    dayRDV = dayRDV.plusMinutes(timeused);
+                    lisDayRdDV.add(dayRDV);
+                }
+                if(lisDayRdDV.size() >= 6){
+                    break;
                 }
             }
         }
-        return LocalDate.now();
+        return lisDayRdDV;
     }
 
 }

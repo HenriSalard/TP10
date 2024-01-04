@@ -16,7 +16,7 @@ public class Visite {
     private LocalDateTime dateAnalyse;
 
     @Column(name = "resultat",columnDefinition = "TEXT")
-    private String resultat;
+    private String resultat = "Pas encore de résultat";
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="Utilisateur_numSecuriteSociale")
