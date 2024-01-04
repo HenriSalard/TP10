@@ -6,7 +6,11 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,9 +24,11 @@ import org.hibernate.SessionFactory;
 
 
 public class InterfaceDemandeVisite extends JFrame {
+
+    private Utilisateur selectedUser;
     private JPanel cardPanel;
     private JButton centerButton;
-    private JComboBox<String> medecinDayComboBox;
+    private JComboBox<DateEntry> medecinDayComboBox;
 
     private JPanel topPanel;
     private JPanel centerPanel;
@@ -31,10 +37,13 @@ public class InterfaceDemandeVisite extends JFrame {
     private JTextField tfCB;
 
 
+
     private static final long serialVersionUID = 1L;
 
     public InterfaceDemandeVisite(SessionFactory sessFact, Utilisateur selectedUtilisateur) {
         setTitle("Prise de rendez-vous");
+
+        selectedUser = selectedUtilisateur;
 
         topPanel = createTopPanel(sessFact);
         centerPanel = new JPanel(new GridBagLayout());
@@ -111,15 +120,19 @@ public class InterfaceDemandeVisite extends JFrame {
     private void updateCenterPanel(SessionFactory sessFact, TypeAnalyse selectedType) {
 
         JLabel centerLabel = new JLabel("Sélectionnez un créneau disponible pour le type d'analyse  " + selectedType.getLabelType());
-
-        List<Medecin> lisMed = Requete.FindMedAut(sessFact, selectedType);
-        DayOfWeek[] lisDaysOfWeek = {DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY};
         medecinDayComboBox = new JComboBox<>();
 
-        for (Medecin med : lisMed){
-            for (DayOfWeek day : lisDaysOfWeek){
-                String comboLabel = "Docteur " + med.getPrenom() + " " + med.getNom() + " le " + GetFrenchDay.getFrenchDay(day);
-                medecinDayComboBox.addItem(comboLabel);
+        List<Medecin> lisMed = Requete.FindMedAut(sessFact, selectedType);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'le' EEEE dd/MM/yyyy", Locale.FRENCH);
+
+
+        for (Medecin med : lisMed) {
+            List<LocalDateTime> listCreneaux = Requete.DateRDVForMedDuration(sessFact, med, selectedType.getDuree());
+
+            for (LocalDateTime dateTime : listCreneaux) {
+                String formattedDate = dateTime.format(formatter); // Formatage de la date selon le pattern défini
+                DateEntry entry = new DateEntry(dateTime, "Docteur " + med.getPrenom() + " " + med.getNom() + " " + formattedDate);
+                medecinDayComboBox.addItem(entry);
             }
         }
 
@@ -127,13 +140,16 @@ public class InterfaceDemandeVisite extends JFrame {
             public void actionPerformed(ActionEvent e){
 
                 // On recupere les données selectionnées
-                String selectedComboLabel = (String) medecinDayComboBox.getSelectedItem();
-                String[] parts = selectedComboLabel.split(" ");
+                DateEntry selectedComboItem = (DateEntry) medecinDayComboBox.getSelectedItem();
+                LocalDateTime selectedDateTime = selectedComboItem.getDateTime();
+
+
+                String medecinLabel = selectedComboItem.toString(); // Récupération de la chaîne formatée du médecin
+
+                // On recupere le nom et le prenom du medecin
+                String[] parts = medecinLabel.split(" ");
                 String selectedMedecinFirstName = parts[1];
                 String selectedMedecinSurname = parts[2];
-                String selectedDayOfWeekString = parts[4];
-
-                DayOfWeek selectedDayOfWeek = GetFrenchDay.convertToDayOfWeek(selectedDayOfWeekString);
 
                 Medecin selectedMedecin = null;
                 for (Medecin med : lisMed) {
@@ -145,7 +161,7 @@ public class InterfaceDemandeVisite extends JFrame {
                 }
 
 
-                updateBottomPanel(sessFact, selectedMedecin, selectedDayOfWeek, selectedType);
+                updateBottomPanel(sessFact, selectedMedecin, selectedDateTime, selectedType);
             }
         });
 
@@ -170,12 +186,10 @@ public class InterfaceDemandeVisite extends JFrame {
         centerPanel.revalidate();
         centerPanel.repaint();
 
-
-
     }
 
 
-    private void updateBottomPanel(SessionFactory sessFact, Medecin selecterMed, DayOfWeek selectedDayOfWeek, TypeAnalyse selectedTypeAnalyse) {
+    private void updateBottomPanel(SessionFactory sessFact, Medecin selectedMed, LocalDateTime selectedDate, TypeAnalyse selectedTypeAnalyse) {
 
         JLabel bottomLabel = new JLabel("Veuilez saisir vos données bancaires :");
         JButton bottomButton = new JButton("Valider");
@@ -218,11 +232,24 @@ public class InterfaceDemandeVisite extends JFrame {
             }
                             });
 
-        /*bottomButton.addActionListener(new ActionListener(){
+        bottomButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                Requete.AddVisite(sessFact, selectedTypeAnalyse, selecterMed, )
+                if (!tfCB.getText().isEmpty()){
+                    System.out.println(selectedDate.toString());
+                    System.out.println(selectedMed.getNom());
+                    System.out.println(selectedUser.getPrenom());
+                    Requete.AddVisite(sessFact, selectedTypeAnalyse, selectedMed, selectedUser, selectedDate);
+
+                    new InterfaceListeVisites(sessFact, selectedUser);
+                    dispose();
+                }
+                else{
+                    errorLabel.setText("Merci de rentrer vos coordonnées bancaires avant de valider");
+                }
+
+
             }
-                                       }*/
+                                       });
 
 
         bottomPanel.revalidate();
@@ -236,6 +263,7 @@ public class InterfaceDemandeVisite extends JFrame {
         SessionFactory sessFact = HibernateUtil.getSessionFactory();
 
         Utilisateur selectedUtilisateur = new Utilisateur();
+        selectedUtilisateur.setPrenom("Henri");
 
         new InterfaceDemandeVisite(sessFact, selectedUtilisateur);
 

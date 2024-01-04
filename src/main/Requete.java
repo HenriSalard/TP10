@@ -121,7 +121,7 @@ public class Requete {
         org.hibernate.Transaction tr = session.beginTransaction();
 
         Query<Visite> query = session.createQuery("FROM Visite " +
-                "WHERE fk_user =: userParam", Visite.class);
+                "WHERE fk_Utilisateur =: userParam", Visite.class);
         query.setParameter("userParam", utilisateur);
 
         List<Visite> lisVis = query.getResultList();

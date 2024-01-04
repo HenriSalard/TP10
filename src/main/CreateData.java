@@ -1,7 +1,6 @@
 package main;
 
-import java.sql.SQLException;
-import java.sql.Time;
+import java.sql.*;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -131,15 +130,37 @@ public class CreateData {
         tr.commit();
         session.close();
 
-        /*for(Medecin i : FindMedAut(sessFact,type2))
-        {
-            System.out.println(i.getNom());
-            System.out.println("Temps total du médecin i au jour d : " +FindTotalTimeVisMedDate(sessFact,(long)i.getIdMed(),LocalDate.now()));
-        }*/
 
         System.out.println(Requete.UserFromNumSec(sessFact,1000000001L));
 
         //for (LocalDateTime loc : Requete.DateRDVForMedDuration(sessFact,med1,30)) System.out.println(loc.toString());
 
     }
+
+
+    public static void main(String[] args) {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/tp10", "root", "password");
+            Statement statement = connection.createStatement();
+
+            statement.execute("DROP DATABASE TP10");
+            statement.execute("CREATE DATABASE TP10");
+
+            statement.close();
+            connection.close();
+
+            SessionFactory sessFact = HibernateUtil.getSessionFactory();
+
+            CreateData.FillTable(sessFact);
+
+            sessFact.close();
+
+        } catch (Exception e) {
+            System.out.println("Erreur lors de l'initialisation");
+            e.printStackTrace();
+        }
+
+
+    }
+
 }

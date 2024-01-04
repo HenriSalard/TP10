@@ -20,6 +20,8 @@ public class InterfaceListeVisites extends JFrame {
         JLabel labelBonjour = new JLabel("Bonjour " + selectedUtilisateur.getPrenom() + " "
                 + selectedUtilisateur.getNom() + " voici vos analyses passées ou à venir.");
 
+        labelBonjour.setHorizontalAlignment(SwingConstants.CENTER);
+
         JPanel mainPanel = new JPanel(new BorderLayout());
 
         String[] columns = {"Date", "Type d'analyse", "Resultat"};
@@ -35,7 +37,25 @@ public class InterfaceListeVisites extends JFrame {
         JTable table = new JTable(new DefaultTableModel(data, columns));
         JScrollPane scrollPane = new JScrollPane(table);
 
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+
+        // PARTIE POUR LE BOUTTON VERS DEMANDE DE VISITE
+
+        JButton buttonDemandeVisite = new JButton("Faire une nouvelle demande d'analyse'");
+        buttonDemandeVisite.addActionListener(e -> {
+            new InterfaceDemandeVisite(sessFact, selectedUtilisateur);
+            dispose(); // Ferme la fenêtre actuelle après ouverture de la nouvelle interface
+        });
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.add(buttonDemandeVisite);
+
+        //ajout des elements au mainPanel
+
+        mainPanel.add(labelBonjour, BorderLayout.NORTH); // Ajoute le label en haut
+        mainPanel.add(scrollPane, BorderLayout.CENTER); // Ajoute le tableau au centre
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH); // Ajoute le boutton en bas
+
 
         add(mainPanel);
 
@@ -46,5 +66,13 @@ public class InterfaceListeVisites extends JFrame {
         setVisible(true);
 
 
+    }
+
+    public static void main(String[] args) {
+        SessionFactory sessFact = HibernateUtil.getSessionFactory();
+
+        Utilisateur selectedUser = Requete.UserFromNumSec(sessFact, 100000000001L);
+
+        new InterfaceListeVisites(sessFact, selectedUser);
     }
 }

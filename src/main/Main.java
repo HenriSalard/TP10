@@ -12,20 +12,11 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/tp10", "root", "password");
-            Statement statement = connection.createStatement();
-
-            statement.execute("DROP DATABASE TP10");
-            statement.execute("CREATE DATABASE TP10");
-
-            statement.close();
-            connection.close();
 
             SessionFactory sessFact = HibernateUtil.getSessionFactory();
 
-            CreateData.FillTable(sessFact);
 
-            sessFact.close();
+            new InterfaceConnexion(sessFact);
 
 
         } catch (Exception e) {

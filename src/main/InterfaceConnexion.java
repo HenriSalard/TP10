@@ -19,14 +19,14 @@ public class InterfaceConnexion extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
 
         JLabel labelBienvenue = new JLabel("Bienvenue sur l'application du laboratoire d'analyses.");
-        JTextField TFnumSecu = new JTextField("Votre numéro de sécurité sociale");
-        JTextField TFpassword = new JTextField("Votre mot de passe");
+        JTextField TFnumSecu = new JTextField("Votre numéro de sécurité sociale", 18);
+        JTextField TFpassword = new JTextField("Votre mot de passe", 18);
         JButton buttonValider = new JButton("Valider");
         JLabel labelError = new JLabel("");
         labelError.setForeground(Color.red);
         JButton buttonCreerCompte = new JButton("Creer un nouveau compte");
 
-        TFnumSecu.addFocusListener(new FocusListener() {
+       TFnumSecu.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
                 if (TFnumSecu.getText().equals("Votre numéro de sécurité sociale")) {
@@ -41,7 +41,6 @@ public class InterfaceConnexion extends JFrame {
                 }
             }
         });
-
         TFpassword.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -73,38 +72,50 @@ public class InterfaceConnexion extends JFrame {
         mainPanel.add(TFpassword, gbc);
 
         gbc.gridy = 3;
-        mainPanel.add(buttonValider, gbc);
-
-        gbc.gridy = 3;
         mainPanel.add(labelError, gbc);
+
+        gbc.gridy = 4;
+        mainPanel.add(buttonValider, gbc);
 
         gbc.gridy = 5;
         mainPanel.add(buttonCreerCompte, gbc);
 
 
-
-
-        Utilisateur selectedUtilisateur = null;
-
-        /*
-        requete qui retourne l'utilisateur pour le num de secu
-        verif du mot de passe et affichage du message d'erreur si besoin
-
-
-
-
-         */
-
         buttonValider.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                new InterfaceListeVisites(sessFact, selectedUtilisateur);
-                dispose();
+
+                // Recuperation du numero de securite sociale
+                long numeroSecu = Long.parseLong(TFnumSecu.getText());
+
+
+                // Recuperation de l'utilisateur
+                Utilisateur selectedUtilisateur = Requete.UserFromNumSec(sessFact, numeroSecu);
+
+                if (selectedUtilisateur == null){
+                    labelError.setText("Erreur, cet utilisateur n'existe pas");
+                }
+                else{
+
+                    // On verifie le mot de passe
+                    if(selectedUtilisateur.getMotDePasse().equals(TFpassword.getText())){
+                        System.out.println(selectedUtilisateur.getPrenom());
+                        new InterfaceListeVisites(sessFact, selectedUtilisateur);
+                        dispose();
+                    }
+                    else{
+                        labelError.setText("Mot de passse incorect");
+                    }
+
+                }
+
+
+
             }
         });
 
         buttonCreerCompte.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new InterfaceNewUser(sessFact);
+                new InterfaceNouvelUtilisateur(sessFact);
                 dispose();
             }
         });
@@ -113,7 +124,6 @@ public class InterfaceConnexion extends JFrame {
         TFnumSecu.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent ke) {
                 char keyPressed = ke.getKeyChar();
-
                 if (Character.isDigit(keyPressed) || ke.getKeyCode() == KeyEvent.VK_BACK_SPACE){
                     TFnumSecu.setEditable(true);
                     labelError.setText("");
@@ -124,6 +134,7 @@ public class InterfaceConnexion extends JFrame {
                 }
             }
         });
+
 
         add(mainPanel);
 

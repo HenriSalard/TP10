@@ -26,7 +26,7 @@ public class Visite {
     @JoinColumn(name="Medecin_numSecuriteSociale")
     private Medecin fk_Med;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="typeAnalyse_labelType")
     private TypeAnalyse fk_Type;
 
