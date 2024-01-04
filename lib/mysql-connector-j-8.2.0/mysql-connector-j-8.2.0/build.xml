@@ -325,7 +325,7 @@ See also com.mysql.cj.conf.PropertyDefinitions.SYSP_* variables for other test o
     <!-- ************************* -->
 
 
-    <!-- Check required external libraries path. -->
+    <!-- Check required external "libraries path. -->
     <target name="-extra-libs-check">
         <fail message="The property 'com.mysql.cj.extra.libs' must point to a directory that contains the 3rd party libraries required for building tasks.">
             <condition>
