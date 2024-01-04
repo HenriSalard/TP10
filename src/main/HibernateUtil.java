@@ -5,9 +5,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
-import model.Medecin;
-import model.TypeAnalyse;
-import model.User;
+import model.Utilisateur;
 
 /**
  * @author Quiniou Baptiste
@@ -20,7 +18,7 @@ public class HibernateUtil {
             Configuration conf = new Configuration().configure();
             conf.addAnnotatedClass(model.Medecin.class);
             conf.addAnnotatedClass(model.TypeAnalyse.class);
-            conf.addAnnotatedClass(model.User.class);
+            conf.addAnnotatedClass(model.Utilisateur.class);
             conf.addAnnotatedClass(model.Autorisation.class);
             conf.addAnnotatedClass(model.AutorisationId.class);
             conf.addAnnotatedClass(model.Planning.class);

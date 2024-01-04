@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 
 import model.Medecin;
 import model.TypeAnalyse;
-import model.User;
+import model.Utilisateur;
 import org.hibernate.SessionFactory;
 
 
@@ -33,7 +33,7 @@ public class InterfaceDemandeVisite extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    public InterfaceDemandeVisite(SessionFactory sessFact, User selectedUser) {
+    public InterfaceDemandeVisite(SessionFactory sessFact, Utilisateur selectedUtilisateur) {
         setTitle("Prise de rendez-vous");
 
         topPanel = createTopPanel(sessFact);
@@ -235,9 +235,9 @@ public class InterfaceDemandeVisite extends JFrame {
 
         SessionFactory sessFact = HibernateUtil.getSessionFactory();
 
-        User selectedUser = new User();
+        Utilisateur selectedUtilisateur = new Utilisateur();
 
-        new InterfaceDemandeVisite(sessFact, selectedUser);
+        new InterfaceDemandeVisite(sessFact, selectedUtilisateur);
 
     }
 

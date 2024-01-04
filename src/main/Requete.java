@@ -2,14 +2,17 @@ package main;
 
 import model.Medecin;
 import model.TypeAnalyse;
-import model.User;
+import model.Utilisateur;
 import model.Visite;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
+import java.sql.Time;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 public class Requete {
@@ -55,30 +58,41 @@ public class Requete {
         return lisDay;
     }
 
-    public static Integer FindTotalTimeVisMedDay(SessionFactory sessFact, long idMed, DayOfWeek day){
+    public static long FindTotalTimeVisMedDate(SessionFactory sessFact, long idMed, LocalDate date){
+
+        //Retourne le temps total des visites d'un médecin à un date donnée
+        //Renvoie -1 si pas de visites ce jour-là
 
         Session session = sessFact.getCurrentSession();
         org.hibernate.Transaction tr = session.beginTransaction();
 
-        //VERIFIE QUE VISITE N4EST PAS VIDE
+        //VERIFIE QUE VISITE N'EST PAS VIDE
         Query<Long> querycount = session.createQuery("SELECT COUNT(*) FROM Visite", Long.class);
         if(querycount.getSingleResult()>0){
-            Query<Integer> query = session.createQuery("SELECT SUM(duree) "
-                    + "FROM Visite V INNER JOIN V.fk_Med M "
-                    + "WHERE  M.numSecuriteSociale =: idMed AND DAYNAME(V.dateAnalyse) =: dayParam", Integer.class);
+            Query query = session.createQuery("SELECT SUM(T.duree) "
+                    + "FROM Visite V INNER JOIN V.fk_Med M join V.fk_Type T "
+                    + "WHERE  M.numSecuriteSociale =: idMed "
+                    + "AND YEAR(V.dateAnalyse) =: dateYear "
+                    + "AND MONTH(V.dateAnalyse) =: dateMonth "
+                    + "AND DAYOFMONTH(V.dateAnalyse) =: dateDay ");
             query.setParameter("idMed", idMed);
-            query.setParameter("dayParam", day);
+            query.setParameter("dateYear", date.getYear());
+            query.setParameter("dateMonth", date.getMonth().getValue());
+            query.setParameter("dateDay", date.getDayOfMonth());
 
-            tr.rollback();
-            session.close();
-            return query.getSingleResult();
+            if(query.getSingleResult() != null){
+                long time = (long)query.getSingleResult();
+                tr.rollback();
+                session.close();
+                return time;
+            }
         }
         else{
             System.out.println("Pas de visite passé ou à venir.");
-            tr.rollback();
-            session.close();
-            return -1;
         }
+        tr.rollback();
+        session.close();
+        return -1;
     }
 
     //Renvoie tous les Types d'analyses
@@ -97,14 +111,14 @@ public class Requete {
     }
 
     //Renvoie les visites d'un Utilisateur
-    public static List<Visite> VisFromUser(SessionFactory sessFact, User user){
+    public static List<Visite> VisFromUser(SessionFactory sessFact, Utilisateur utilisateur){
 
         Session session = sessFact.getCurrentSession();
         org.hibernate.Transaction tr = session.beginTransaction();
 
         Query<Visite> query = session.createQuery("FROM Visite " +
                 "WHERE fk_user =: userParam", Visite.class);
-        query.setParameter("userParam",user);
+        query.setParameter("userParam", utilisateur);
 
         List<Visite> lisVis = query.getResultList();
 
@@ -113,7 +127,7 @@ public class Requete {
         return lisVis;
     }
 
-    public static boolean AddVisite(SessionFactory sessFact, TypeAnalyse type, Medecin med, User patient, LocalDateTime day_time){
+    public static boolean AddVisite(SessionFactory sessFact, TypeAnalyse type, Medecin med, Utilisateur patient, LocalDateTime day_time){
         Session session = sessFact.getCurrentSession();
         org.hibernate.Transaction tr = session.beginTransaction();
 
@@ -130,6 +144,64 @@ public class Requete {
 
         return true;
 
+    }
+
+    public static Utilisateur UserFromNumSec(SessionFactory sessFact, long numSec){
+        Session session = sessFact.getCurrentSession();
+        org.hibernate.Transaction tr = session.beginTransaction();
+
+        Query<Utilisateur> query = session.createQuery("FROM Utilisateur " +
+                "WHERE numSecuriteSociale =: userParam", Utilisateur.class);
+        query.setParameter("userParam",numSec);
+
+        Utilisateur utilisateur = query.getSingleResult();
+
+        tr.rollback();
+        session.close();
+        return utilisateur;
+    }
+
+    public static LocalDate DateRDVForMedDuration(SessionFactory sessFact, Medecin med, int duree){
+
+        //On regarde a partir de demain
+        LocalDate dayRDV = LocalDate.now();
+        int i =0;
+        //Tant que l'on a pas trouvé le jour
+        while(i<5){
+            i++;
+            //Seulement les jours où le médecin travaille
+            for(DayOfWeek dayWeek : FindDayMed(sessFact,med.getIdMed())){
+
+                //On se met à ce jour
+                dayRDV = dayRDV.with(TemporalAdjusters.next(dayWeek));
+
+                //On récupère le temps utilisé par le médecin ce jour là
+                long timeused = Requete.FindTotalTimeVisMedDate(sessFact,med.getIdMed(),dayRDV);
+
+                //On récupèrele temps total de ce médecin ce jour là
+                Session session = sessFact.getCurrentSession();
+                org.hibernate.Transaction tr = session.beginTransaction();
+
+                Query query = session.createQuery("SELECT (hour(endHour)-hour(startHour))*60 + minute(endHour)-minute(startHour) " +
+                        "FROM Planning " +
+                        "WHERE idPlan.planMed =: medParam AND idPlan.planJour =: dayParam");
+                query.setParameter("medParam",med);
+                query.setParameter("dayParam",dayWeek);
+
+                int minuteDay = (int)query.getSingleResult();
+
+                tr.rollback();
+                session.close();
+
+                System.out.println("Temps total : "+minuteDay + " Temps utilisé : " + timeused );
+                System.out.println("Duree : "+duree + " Temps restant : " + (minuteDay - timeused) );
+
+                if(minuteDay - timeused > duree) {
+                    return dayRDV;
+                }
+            }
+        }
+        return LocalDate.now();
     }
 
 }

@@ -1,6 +1,6 @@
 package main;
 
-import model.User;
+import model.Utilisateur;
 import model.Visite;
 import org.hibernate.SessionFactory;
 
@@ -12,13 +12,13 @@ import java.util.List;
 public class InterfaceListeVisites extends JFrame {
 
 
-    public InterfaceListeVisites(SessionFactory sessFact, User selectedUser) {
+    public InterfaceListeVisites(SessionFactory sessFact, Utilisateur selectedUtilisateur) {
         setTitle("Liste des visites");
 
-        List<Visite> listeVisites = Requete.VisFromUser(sessFact, selectedUser);
+        List<Visite> listeVisites = Requete.VisFromUser(sessFact, selectedUtilisateur);
 
-        JLabel labelBonjour = new JLabel("Bonjour " + selectedUser.getPrenom() + " "
-                + selectedUser.getNom() + " voici vos analyses passées ou à venir.");
+        JLabel labelBonjour = new JLabel("Bonjour " + selectedUtilisateur.getPrenom() + " "
+                + selectedUtilisateur.getNom() + " voici vos analyses passées ou à venir.");
 
         JPanel mainPanel = new JPanel(new BorderLayout());
 

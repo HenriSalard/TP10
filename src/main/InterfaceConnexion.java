@@ -1,8 +1,6 @@
 package main;
 
-import main.HibernateUtil;
-import model.TypeAnalyse;
-import model.User;
+import model.Utilisateur;
 import org.hibernate.SessionFactory;
 
 import javax.swing.*;
@@ -86,7 +84,7 @@ public class InterfaceConnexion extends JFrame {
 
 
 
-        User selectedUser = null;
+        Utilisateur selectedUtilisateur = null;
 
         /*
         requete qui retourne l'utilisateur pour le num de secu
@@ -99,7 +97,7 @@ public class InterfaceConnexion extends JFrame {
 
         buttonValider.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                new InterfaceListeVisites(sessFact, selectedUser);
+                new InterfaceListeVisites(sessFact, selectedUtilisateur);
                 dispose();
             }
         });

@@ -3,13 +3,13 @@ package main;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.Month;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import model.*;
-
-import static main.Requete.*;
 
 public class CreateData {
     @SuppressWarnings("deprecation")
@@ -19,26 +19,26 @@ public class CreateData {
         org.hibernate.Transaction tr = session.beginTransaction();
 
         //Utilisateur
-        User user1 = new User();
-        user1.setIdUser(100000000001L);
-        user1.setNom("QUINIOU");
-        user1.setPrenom("Baptiste");
-        user1.setMotDePasse("1234");
-        session.save(user1);
+        Utilisateur utilisateur1 = new Utilisateur();
+        utilisateur1.setIdUser(100000000001L);
+        utilisateur1.setNom("QUINIOU");
+        utilisateur1.setPrenom("Baptiste");
+        utilisateur1.setMotDePasse("1234");
+        session.save(utilisateur1);
 
-        User user2 = new User();
-        user2.setIdUser(100000000002L);
-        user2.setNom("SALARD");
-        user2.setPrenom("Henri");
-        user2.setMotDePasse("1234");
-        session.save(user2);
+        Utilisateur utilisateur2 = new Utilisateur();
+        utilisateur2.setIdUser(100000000002L);
+        utilisateur2.setNom("SALARD");
+        utilisateur2.setPrenom("Henri");
+        utilisateur2.setMotDePasse("1234");
+        session.save(utilisateur2);
 
-        User user3 = new User();
-        user3.setIdUser(200000000001L);
-        user3.setNom("ONYME");
-        user3.setPrenom("Anne");
-        user3.setMotDePasse("1234");
-        session.save(user3);
+        Utilisateur utilisateur3 = new Utilisateur();
+        utilisateur3.setIdUser(200000000001L);
+        utilisateur3.setNom("ONYME");
+        utilisateur3.setPrenom("Anne");
+        utilisateur3.setMotDePasse("1234");
+        session.save(utilisateur3);
 
         //Medecin
         Medecin med1 = new Medecin();
@@ -121,18 +121,24 @@ public class CreateData {
         plan5.setEndHour(new Time(18,0,0));
         session.save(plan5);
 
-
+        Visite vis = new Visite();
+        vis.setFk_User(utilisateur1);
+        vis.setFk_Type(type2);
+        vis.setFk_Med(med1);
+        vis.setDateAnalyse(LocalDateTime.of(2024, Month.JANUARY,4, 10,0));
+        session.save(vis);
 
         tr.commit();
         session.close();
 
-        for(Medecin i : FindMedAut(sessFact,type2))
+        /*for(Medecin i : FindMedAut(sessFact,type2))
         {
             System.out.println(i.getNom());
-            for(DayOfWeek d : FindDayMed(sessFact,(long)i.getIdMed())){
-                System.out.println(d.toString());
-                System.out.println("Temps total du médecin i au jour d : " +FindTotalTimeVisMedDay(sessFact,(long)i.getIdMed(),d));
-            }
-        }
+            System.out.println("Temps total du médecin i au jour d : " +FindTotalTimeVisMedDate(sessFact,(long)i.getIdMed(),LocalDate.now()));
+        }*/
+
+        System.out.println(Requete.UserFromNumSec(sessFact,100000000001L).getNom());
+
+        System.out.println(Requete.DateRDVForMedDuration(sessFact,med1,30).toString());
     }
 }

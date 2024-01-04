@@ -20,7 +20,7 @@ public class Visite {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="Utilisateur_numSecuriteSociale")
-    private User fk_User;
+    private Utilisateur fk_Utilisateur;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="Medecin_numSecuriteSociale")
@@ -54,12 +54,12 @@ public class Visite {
         this.resultat = resultat;
     }
 
-    public User getFk_User() {
-        return fk_User;
+    public Utilisateur getFk_User() {
+        return fk_Utilisateur;
     }
 
-    public void setFk_User(User fk_User) {
-        this.fk_User = fk_User;
+    public void setFk_User(Utilisateur fk_Utilisateur) {
+        this.fk_Utilisateur = fk_Utilisateur;
     }
 
     public Medecin getFk_Med() {
