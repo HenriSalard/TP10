@@ -137,7 +137,7 @@ public class CreateData {
             System.out.println("Temps total du médecin i au jour d : " +FindTotalTimeVisMedDate(sessFact,(long)i.getIdMed(),LocalDate.now()));
         }*/
 
-        System.out.println(Requete.UserFromNumSec(sessFact,1000));
+        System.out.println(Requete.UserFromNumSec(sessFact,1000000001L));
 
         //for (LocalDateTime loc : Requete.DateRDVForMedDuration(sessFact,med1,30)) System.out.println(loc.toString());
 

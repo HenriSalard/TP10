@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
+import javax.persistence.NoResultException;
 import java.sql.Time;
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -157,17 +158,19 @@ public class Requete {
                 "WHERE numSecuriteSociale =: userParam", Utilisateur.class);
         query.setParameter("userParam",numSec);
 
-        if(query.getFetchSize() == null){
+        try{
+            Utilisateur utilisateur = query.getSingleResult();
+            tr.rollback();
+            session.close();
+            return utilisateur;
+        }
+        catch(NoResultException exc){
+            System.out.println("Pas d'utilisateur");
             tr.rollback();
             session.close();
             return null;
         }
 
-        Utilisateur utilisateur = query.getSingleResult();
-
-        tr.rollback();
-        session.close();
-        return utilisateur;
     }
 
     public static ArrayList<LocalDateTime> DateRDVForMedDuration(SessionFactory sessFact, Medecin med, int duree){
