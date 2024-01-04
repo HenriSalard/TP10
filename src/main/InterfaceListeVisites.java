@@ -17,6 +17,9 @@ public class InterfaceListeVisites extends JFrame {
 
         List<Visite> listeVisites = Requete.VisFromUser(sessFact, selectedUser);
 
+        JLabel labelBonjour = new JLabel("Bonjour " + selectedUser.getPrenom() + " "
+                + selectedUser.getNom() + " voici vos analyses passées ou à venir.");
+
         JPanel mainPanel = new JPanel(new BorderLayout());
 
         String[] columns = {"Date", "Type d'analyse", "Resultat"};

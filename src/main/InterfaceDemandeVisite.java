@@ -205,7 +205,6 @@ public class InterfaceDemandeVisite extends JFrame {
         // code pour que le textField n'accepte que des chiffre
         tfCB.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent ke) {
-                String value = tfCB.getText();
                 char keyPressed = ke.getKeyChar();
 
                 if (Character.isDigit(keyPressed) || ke.getKeyCode() == KeyEvent.VK_BACK_SPACE){

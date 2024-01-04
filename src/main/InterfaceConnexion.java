@@ -7,8 +7,7 @@ import org.hibernate.SessionFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 public class InterfaceConnexion extends JFrame {
 
@@ -27,7 +26,39 @@ public class InterfaceConnexion extends JFrame {
         JButton buttonValider = new JButton("Valider");
         JLabel labelError = new JLabel("");
         labelError.setForeground(Color.red);
-        JButton ButtonCreerCompte = new JButton("Creer un nouveau compte");
+        JButton buttonCreerCompte = new JButton("Creer un nouveau compte");
+
+        TFnumSecu.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (TFnumSecu.getText().equals("Votre numéro de sécurité sociale")) {
+                    TFnumSecu.setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (TFnumSecu.getText().isEmpty()) {
+                    TFnumSecu.setText("Votre numéro de sécurité sociale");
+                }
+            }
+        });
+
+        TFpassword.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (TFpassword.getText().equals("Votre mot de passe")) {
+                    TFpassword.setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (TFpassword.getText().isEmpty()) {
+                    TFpassword.setText("Votre mot de passe");
+                }
+            }
+        });
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -50,23 +81,51 @@ public class InterfaceConnexion extends JFrame {
         mainPanel.add(labelError, gbc);
 
         gbc.gridy = 5;
-        mainPanel.add(ButtonCreerCompte, gbc);
-
-
+        mainPanel.add(buttonCreerCompte, gbc);
 
 
 
 
         User selectedUser = null;
 
+        /*
+        requete qui retourne l'utilisateur pour le num de secu
+        verif du mot de passe et affichage du message d'erreur si besoin
+
+
+
+
+         */
+
         buttonValider.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 new InterfaceListeVisites(sessFact, selectedUser);
+                dispose();
             }
         });
 
+        buttonCreerCompte.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new InterfaceNewUser(sessFact);
+                dispose();
+            }
+        });
 
+        // code pour que le textField n'accepte que des chiffre
+        TFnumSecu.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent ke) {
+                char keyPressed = ke.getKeyChar();
 
+                if (Character.isDigit(keyPressed) || ke.getKeyCode() == KeyEvent.VK_BACK_SPACE){
+                    TFnumSecu.setEditable(true);
+                    labelError.setText("");
+                }else {
+                    TFnumSecu.setEditable(false);
+                    labelError.setText(" Entrez seulement des chiffre ");
+
+                }
+            }
+        });
 
         add(mainPanel);
 
