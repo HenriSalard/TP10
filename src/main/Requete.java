@@ -157,6 +157,12 @@ public class Requete {
                 "WHERE numSecuriteSociale =: userParam", Utilisateur.class);
         query.setParameter("userParam",numSec);
 
+        if(query.getFetchSize() == null){
+            tr.rollback();
+            session.close();
+            return null;
+        }
+
         Utilisateur utilisateur = query.getSingleResult();
 
         tr.rollback();
