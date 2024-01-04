@@ -5,23 +5,24 @@ package main;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.time.DayOfWeek;
 import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.UIManager;
 
+import model.Medecin;
+import model.TypeAnalyse;
+import model.User;
 import org.hibernate.SessionFactory;
 
 
 
-public class InterfaceVisite extends JFrame {
+public class InterfaceDemandeVisite extends JFrame {
     private JPanel cardPanel;
     private JButton centerButton;
+    private JComboBox<String> medecinDayComboBox;
 
     private JPanel topPanel;
     private JPanel centerPanel;
@@ -32,21 +33,14 @@ public class InterfaceVisite extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    public InterfaceVisite(SessionFactory sessFact) {
+    public InterfaceDemandeVisite(SessionFactory sessFact, User selectedUser) {
         setTitle("Prise de rendez-vous");
 
-        topPanel = createTopPanel();
+        topPanel = createTopPanel(sessFact);
         centerPanel = new JPanel(new GridBagLayout());
         bottomPanel = new JPanel(new GridBagLayout());
 
         centerButton = new JButton();
-
-        centerButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
-
-                updateBottomPanel();
-            }
-        });
 
         setLayout(new BorderLayout());
 
@@ -64,16 +58,25 @@ public class InterfaceVisite extends JFrame {
 
     }
 
-    private JPanel createTopPanel() {
+    private JPanel createTopPanel(SessionFactory sessFact) {
         JPanel topPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
 
+        List<TypeAnalyse> types = Requete.AllType(sessFact);
+
+        String[] labelsAnalyzes = new String[types.size()];
+
+        for (int i = 0; i < types.size(); i++) {
+            labelsAnalyzes[i] = types.get(i).getLabelType();
+        }
+
+
+
         JLabel labelBienvenue = new JLabel("Bienvenue sur la plateforme du laboratoire d'analyses.");
         JLabel labelConsignes = new JLabel("Sélectionnez le type d'analyse qui vous intéresse");
-        String s1[] = { "SANG", "VIH", "DIABETE" };
-        JComboBox<String> comboBox = new JComboBox<>(s1);
+        JComboBox<String> comboBox = new JComboBox<>(labelsAnalyzes);
 
         JButton submit = new JButton("Valider");
 
@@ -95,8 +98,9 @@ public class InterfaceVisite extends JFrame {
 
         submit.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                String selectedValue = (String) comboBox.getSelectedItem();
-                updateCenterPanel(selectedValue);
+                int selectedIndex = comboBox.getSelectedIndex();
+                TypeAnalyse selectedType = types.get(selectedIndex);
+                updateCenterPanel(sessFact, selectedType);
             }
         });
 
@@ -104,9 +108,46 @@ public class InterfaceVisite extends JFrame {
     }
 
 
-    private void updateCenterPanel(String selectedValue) {
+    private void updateCenterPanel(SessionFactory sessFact, TypeAnalyse selectedType) {
 
-        JLabel centerLabel = new JLabel("Sélectionnez un créneau disponible pour le type d'analyse  " + selectedValue);
+        JLabel centerLabel = new JLabel("Sélectionnez un créneau disponible pour le type d'analyse  " + selectedType.getLabelType());
+
+        List<Medecin> lisMed = Requete.FindMedAut(sessFact, selectedType);
+        DayOfWeek[] lisDaysOfWeek = {DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY};
+        medecinDayComboBox = new JComboBox<>();
+
+        for (Medecin med : lisMed){
+            for (DayOfWeek day : lisDaysOfWeek){
+                String comboLabel = "Docteur " + med.getPrenom() + " " + med.getNom() + " le " + GetFrenchDay.getFrenchDay(day);
+                medecinDayComboBox.addItem(comboLabel);
+            }
+        }
+
+        centerButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+
+                // On recupere les données selectionnées
+                String selectedComboLabel = (String) medecinDayComboBox.getSelectedItem();
+                String[] parts = selectedComboLabel.split(" ");
+                String selectedMedecinFirstName = parts[1];
+                String selectedMedecinSurname = parts[2];
+                String selectedDayOfWeekString = parts[4];
+
+                DayOfWeek selectedDayOfWeek = GetFrenchDay.convertToDayOfWeek(selectedDayOfWeekString);
+
+                Medecin selectedMedecin = null;
+                for (Medecin med : lisMed) {
+                    // si meme nom et prenom alors c'est ce medecin la
+                    if (med.getNom().equals(selectedMedecinSurname) && med.getPrenom().equals(selectedMedecinFirstName)) {
+                        selectedMedecin = med;
+                        break;
+                    }
+                }
+
+
+                updateBottomPanel(sessFact, selectedMedecin, selectedDayOfWeek, selectedType);
+            }
+        });
 
         centerPanel.removeAll();
 
@@ -119,7 +160,10 @@ public class InterfaceVisite extends JFrame {
         centerPanel.add(centerLabel, gbcCenter);
 
         gbcCenter.gridy = 1;
-        centerButton.setText("Action pour " + selectedValue); // Mettre à jour le texte du bouton
+        centerPanel.add(medecinDayComboBox, gbcCenter);
+
+        gbcCenter.gridy = 2;
+        centerButton.setText("Valider"); // Mettre à jour le texte du bouton
         centerPanel.add(centerButton, gbcCenter);
 
 
@@ -131,7 +175,7 @@ public class InterfaceVisite extends JFrame {
     }
 
 
-    private void updateBottomPanel() {
+    private void updateBottomPanel(SessionFactory sessFact, Medecin selecterMed, DayOfWeek selectedDayOfWeek, TypeAnalyse selectedTypeAnalyse) {
 
         JLabel bottomLabel = new JLabel("Veuilez saisir vos données bancaires :");
         JButton bottomButton = new JButton("Valider");
@@ -162,7 +206,9 @@ public class InterfaceVisite extends JFrame {
         tfCB.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent ke) {
                 String value = tfCB.getText();
-                if (ke.getKeyChar() >= '0'  && ke.getKeyChar() <= '9'){
+                char keyPressed = ke.getKeyChar();
+
+                if (Character.isDigit(keyPressed) || ke.getKeyCode() == KeyEvent.VK_BACK_SPACE){
                     tfCB.setEditable(true);
                     errorLabel.setText("");
                 }else {
@@ -172,6 +218,12 @@ public class InterfaceVisite extends JFrame {
                 }
             }
                             });
+
+        /*bottomButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                Requete.AddVisite(sessFact, selectedTypeAnalyse, selecterMed, )
+            }
+                                       }*/
 
 
         bottomPanel.revalidate();
@@ -184,7 +236,9 @@ public class InterfaceVisite extends JFrame {
 
         SessionFactory sessFact = HibernateUtil.getSessionFactory();
 
-        new InterfaceVisite(sessFact);
+        User selectedUser = new User();
+
+        new InterfaceDemandeVisite(sessFact, selectedUser);
 
     }
 

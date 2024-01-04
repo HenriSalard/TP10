@@ -59,17 +59,17 @@ public class CreateData {
 
         //Type Analyse
         TypeAnalyse type1 = new TypeAnalyse();
-        type1.setLabelType("Sang");
+        type1.setLabelType("Groupe sanguin");
         type1.setDuree(20);
         session.save(type1);
 
         TypeAnalyse type2 = new TypeAnalyse();
-        type2.setLabelType("VIH");
+        type2.setLabelType("Hémogramme");
         type2.setDuree(30);
         session.save(type2);
 
         TypeAnalyse type3 = new TypeAnalyse();
-        type3.setLabelType("Diabète");
+        type3.setLabelType("Vitesse de sédimentation");
         type3.setDuree(40);
         session.save(type3);
 
@@ -126,12 +126,12 @@ public class CreateData {
         tr.commit();
         session.close();
 
-        for(Object i : FindMedAut(sessFact,type2))
+        for(Medecin i : FindMedAut(sessFact,type2))
         {
-            System.out.println((long)i);
-            for(DayOfWeek d : FindDayMed(sessFact,(long)i)){
+            System.out.println(i.getNom());
+            for(DayOfWeek d : FindDayMed(sessFact,(long)i.getIdMed())){
                 System.out.println(d.toString());
-                System.out.println("Temps total du médecin i au jour d : " +FindTotalTimeVisMedDay(sessFact,(long)i,d));
+                System.out.println("Temps total du médecin i au jour d : " +FindTotalTimeVisMedDay(sessFact,(long)i.getIdMed(),d));
             }
         }
     }

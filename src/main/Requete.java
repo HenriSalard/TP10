@@ -14,18 +14,23 @@ import java.util.List;
 
 public class Requete {
 
-
-    public static List<Object[]> FindMedAut(SessionFactory sessFact, TypeAnalyse type){
+    /**
+     * Methode qui renvoie la liste des medecin pouvant realiser un type d'analyse
+     * @param sessFact
+     * @param type
+     * @return
+     */
+    public static List<Medecin> FindMedAut(SessionFactory sessFact, TypeAnalyse type){
 
         Session session = sessFact.getCurrentSession();
         org.hibernate.Transaction tr = session.beginTransaction();
 
-        Query<Object[]> query = session.createQuery("SELECT new Medecin(M.numSecuriteSociale,M.nom,M.prenom,M.salaire) "
+        Query<Medecin> query = session.createQuery("SELECT new Medecin(M.numSecuriteSociale,M.nom,M.prenom,M.salaire) "
                 + "FROM Autorisation A INNER JOIN A.idAuto.autoMed M INNER JOIN A.idAuto.autoType T "
-                + "WHERE  idType=: typA",Object[].class);
+                + "WHERE  idType=: typA",Medecin.class);
         query.setParameter("typA", type.getIdType());
 
-        List<Object[]> lisIdMed = query.getResultList();
+        List<Medecin> lisIdMed = query.getResultList();
 
         tr.rollback();
         session.close();
