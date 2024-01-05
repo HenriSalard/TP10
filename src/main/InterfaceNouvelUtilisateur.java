@@ -43,7 +43,7 @@ public class InterfaceNouvelUtilisateur extends JFrame {
 
 
         gbc.gridy = 1;
-        gbc.gridx = 2;
+        gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
         mainPanel.add(labelNum, gbc);
 
