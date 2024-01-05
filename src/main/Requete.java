@@ -217,7 +217,7 @@ public class Requete {
                 tr.rollback();
                 session.close();
 
-                if(minuteDay - timeused > duree) {
+                if(minuteDay - timeused >= duree) {
                     dayRDV = dayRDV.withHour(startHour);
                     dayRDV = dayRDV.withMinute(startMin);
                     dayRDV = dayRDV.plusMinutes(timeused);
@@ -229,6 +229,38 @@ public class Requete {
             }
         }
         return lisDayRdDV;
+    }
+
+    public static boolean AddUsertoDB(SessionFactory sessFact, long numSec, String nom, String prenom, String mdp){
+
+        Session session = sessFact.getCurrentSession();
+        org.hibernate.Transaction tr = session.beginTransaction();
+
+        Query<Utilisateur> query = session.createQuery("FROM Utilisateur " +
+                "WHERE numSecuriteSociale =: userParam", Utilisateur.class);
+        query.setParameter("userParam",numSec);
+
+        try{
+            Utilisateur utilisateur = query.getSingleResult();
+            System.out.println("L'utilisateur existe déjà");
+            tr.rollback();
+            session.close();
+            return false;
+        }
+        catch(NoResultException exc){
+            System.out.println("On rajoute l'utilisateur");
+
+            Utilisateur utilisateur = new Utilisateur();
+            utilisateur.setIdUser(numSec);
+            utilisateur.setNom(nom);
+            utilisateur.setPrenom(prenom);
+            utilisateur.setMotDePasse(mdp);
+            session.save(utilisateur);
+
+            tr.commit();
+            session.close();
+            return true;
+        }
     }
 
 }

@@ -5,6 +5,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.Month;
 
+import jdk.jshell.execution.Util;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -131,9 +132,18 @@ public class CreateData {
         session.close();
 
 
-        System.out.println(Requete.UserFromNumSec(sessFact,1000000001L));
+        //System.out.println(Requete.UserFromNumSec(sessFact,1000000001L));
 
         //for (LocalDateTime loc : Requete.DateRDVForMedDuration(sessFact,med1,30)) System.out.println(loc.toString());
+
+        if(Requete.AddUsertoDB(sessFact,100000000003L,"TORTEVOIS", "Evan","password")){
+            Utilisateur user0 = Requete.UserFromNumSec(sessFact,100000000003L);
+            assert user0 != null;
+            System.out.println(user0.getNom());
+        }
+        else {
+            System.out.println("Erreur déjà existant");
+        }
 
     }
 

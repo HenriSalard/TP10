@@ -123,7 +123,7 @@ public class InterfaceDemandeVisite extends JFrame {
         medecinDayComboBox = new JComboBox<>();
 
         List<Medecin> lisMed = Requete.FindMedAut(sessFact, selectedType);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'le' EEEE dd/MM/yyyy", Locale.FRENCH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'le' EEEE dd/MM/yyyy à HH:mm", Locale.FRENCH);
 
 
         for (Medecin med : lisMed) {
@@ -131,7 +131,7 @@ public class InterfaceDemandeVisite extends JFrame {
 
             for (LocalDateTime dateTime : listCreneaux) {
                 String formattedDate = dateTime.format(formatter); // Formatage de la date selon le pattern défini
-                DateEntry entry = new DateEntry(dateTime, "Docteur " + med.getPrenom() + " " + med.getNom() + " " + formattedDate);
+                DateEntry entry = new DateEntry(dateTime, "Dr. " + med.getPrenom() + " " + med.getNom() + " " + formattedDate);
                 medecinDayComboBox.addItem(entry);
             }
         }
