@@ -28,6 +28,8 @@ public class InterfaceDemandeVisite extends JFrame {
     private Utilisateur selectedUser;
     private JPanel cardPanel;
     private JButton centerButton;
+
+    private JButton backButton;
     private JComboBox<DateEntry> medecinDayComboBox;
 
     private JPanel topPanel;
@@ -50,6 +52,13 @@ public class InterfaceDemandeVisite extends JFrame {
         bottomPanel = new JPanel(new GridBagLayout());
 
         centerButton = new JButton();
+
+        backButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                new InterfaceListeVisites(sessFact, selectedUtilisateur);
+                dispose();
+            }
+        });
 
         setLayout(new BorderLayout());
 
@@ -89,6 +98,8 @@ public class InterfaceDemandeVisite extends JFrame {
 
         JButton submit = new JButton("Valider");
 
+        backButton = new JButton("Retour");
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -104,6 +115,9 @@ public class InterfaceDemandeVisite extends JFrame {
 
         gbc.gridy = 3;
         topPanel.add(submit, gbc);
+
+        gbc.gridx = 4;
+        topPanel.add(backButton,gbc);
 
         submit.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
