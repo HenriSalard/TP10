@@ -217,7 +217,7 @@ public class Requete {
                 tr.rollback();
                 session.close();
 
-                if(minuteDay - timeused > duree) {
+                if(minuteDay - timeused >= duree) {
                     dayRDV = dayRDV.withHour(startHour);
                     dayRDV = dayRDV.withMinute(startMin);
                     dayRDV = dayRDV.plusMinutes(timeused);

@@ -7,6 +7,7 @@ import org.hibernate.SessionFactory;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class InterfaceListeVisites extends JFrame {
@@ -24,14 +25,15 @@ public class InterfaceListeVisites extends JFrame {
 
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        String[] columns = {"Date", "Type d'analyse", "Resultat"};
-        Object[][] data = new Object[listeVisites.size()][3];
+        String[] columns = {"Date","Heure", "Type d'analyse", "Resultat"};
+        Object[][] data = new Object[listeVisites.size()][4];
 
         for (int i = 0; i < listeVisites.size(); i++) {
             Visite visite = listeVisites.get(i);
-            data[i][0] = visite.getDateAnalyse();
-            data[i][1] = visite.getFk_Type().getLabelType();
-            data[i][2] = visite.getResultat();
+            data[i][0] = visite.getDateAnalyse().toLocalDate();
+            data[i][1] = visite.getDateAnalyse().toLocalTime().truncatedTo(ChronoUnit.MINUTES);
+            data[i][2] = visite.getFk_Type().getLabelType();
+            data[i][3] = visite.getResultat();
         }
 
         JTable table = new JTable(new DefaultTableModel(data, columns));
