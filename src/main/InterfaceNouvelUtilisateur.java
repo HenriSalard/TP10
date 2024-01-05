@@ -96,7 +96,17 @@ public class InterfaceNouvelUtilisateur extends JFrame {
                         String motDePasse = TFMotDePasse.getText();
 
 
-                        // Creation de l'utilisateur
+                        // Creation de l'utilisateur et on verifie que le numero de secu n'est pas deja dans la BDD
+                        if(Requete.AddUsertoDB(sessFact, numeroSecu, nom, prenom, motDePasse)){
+
+                            // On recupere l'utilisateur que l'on vient de creer
+                            Utilisateur newUser = Requete.UserFromNumSec(sessFact, numeroSecu);
+                            new InterfaceListeVisites(sessFact, newUser);
+
+                        }
+                        else{
+                            labelError.setText("Ce numero de securité sociale est associé à un compte");
+                        }
 
 
                     }
@@ -105,10 +115,27 @@ public class InterfaceNouvelUtilisateur extends JFrame {
         });
 
 
+
+
+        // code pour que le textField du numero de secu accepte que des chiffres
+        TFNum.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent ke) {
+                char keyPressed = ke.getKeyChar();
+                if (Character.isDigit(keyPressed) || ke.getKeyCode() == KeyEvent.VK_BACK_SPACE){
+                    TFNum.setEditable(true);
+                    labelError.setText("");
+                }else {
+                    TFNum.setEditable(false);
+                    labelError.setText(" Entrez seulement des chiffre ");
+
+                }
+            }
+        });
+
         add(mainPanel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
-        setSize(400, 300); // Taille ajustée à 400x300 pixels
+        setSize(400, 400); // Taille ajustée à 400x300 pixels
         setLocationRelativeTo(null);
         setVisible(true);
 
