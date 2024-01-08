@@ -7,6 +7,8 @@ import org.hibernate.SessionFactory;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -40,10 +42,19 @@ public class InterfaceListeVisites extends JFrame {
         JScrollPane scrollPane = new JScrollPane(table);
 
 
+        //PARTIE POUR LA DECONNEXION
+        JButton decoButton = new JButton("Déconnexion");
+        decoButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                new InterfaceConnexion(sessFact);
+                dispose();// Ferme la fenêtre actuelle après ouverture de la nouvelle interface
+            }
+        });
+
 
         // PARTIE POUR LE BOUTTON VERS DEMANDE DE VISITE
 
-        JButton buttonDemandeVisite = new JButton("Faire une nouvelle demande d'analyse'");
+        JButton buttonDemandeVisite = new JButton("Faire une nouvelle demande d'analyse");
         buttonDemandeVisite.addActionListener(e -> {
             new InterfaceDemandeVisite(sessFact, selectedUtilisateur);
             dispose(); // Ferme la fenêtre actuelle après ouverture de la nouvelle interface
@@ -51,6 +62,7 @@ public class InterfaceListeVisites extends JFrame {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(buttonDemandeVisite);
+        buttonPanel.add(decoButton);
 
         //ajout des elements au mainPanel
 

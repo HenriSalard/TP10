@@ -26,6 +26,13 @@ public class CreateData {
         utilisateur1.setMotDePasse("1234");
         session.save(utilisateur1);
 
+        Utilisateur utilisateurTest = new Utilisateur();
+        utilisateurTest.setIdUser(101L);
+        utilisateurTest.setNom("TEST");
+        utilisateurTest.setPrenom("Johnny");
+        utilisateurTest.setMotDePasse("1234");
+        session.save(utilisateurTest);
+
         Utilisateur utilisateur2 = new Utilisateur();
         utilisateur2.setIdUser(100000000002L);
         utilisateur2.setNom("SALARD");
